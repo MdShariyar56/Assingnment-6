@@ -4,8 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green Earth</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
+<body class="bg-[#f0fdf4]">
+   <header>
+  <div class="navbar bg-[#15803d] shadow-sm px-6">
     
+    <!-- Left (Logo) -->
+    <div class="navbar-start">
+      <a class="btn btn-ghost text-xl text-white">Green Earth</a>
+    </div>
+
+    <!-- Center (Mobile Toggle + Desktop Menu) -->
+    <div class="navbar-center">
+      <!-- Mobile hamburger (only on phone) -->
+      <div class="dropdown lg:hidden">
+        <div tabindex="0" role="button" class="btn btn-ghost text-white">
+          <!-- Hamburger Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </div>
+        <!-- Mobile Dropdown Menu -->
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-[#15803d] rounded-box w-52 text-white">
+          <li><a>About</a></li>
+          <li><a>Gallery</a></li>
+          <li><a>Plant a Tree</a></li>
+        </ul>
+      </div>
+
+      <!-- Desktop Menu -->
+      <ul class="menu menu-horizontal px-1 hidden lg:flex text-white">
+        <li><a>About</a></li>
+        <li><a>Gallery</a></li>
+        <li><a>Plant a Tree</a></li>
+      </ul>
+    </div>
+
+    <!-- Right (Button) -->
+    <div class="navbar-end">
+      <a class="btn bg-[#facc15] rounded-full text-[#15803d]">
+        Plant a Tree
+      </a>
+    </div>
+
+  </div>
+</header>
+
+
+
+            
+
 </body>
 </html>
