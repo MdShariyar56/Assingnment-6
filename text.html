@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Green Earth - Assignment</title>
+  <!-- Tailwind CDN (for quick dev) + DaisyUI (optional) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.6.1/dist/full.css" rel="stylesheet"/>
+  <style>
+    /* small custom */
+    .active-cat { background-color: #10b981; color: white; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="text-2xl font-bold">Green Earth</div>
+      <nav class="hidden md:flex gap-6">
+        <a href="#" class="hover:text-green-600">Home</a>
+        <a href="#" class="hover:text-green-600">About</a>
+        <a href="#" class="hover:text-green-600">Campaign</a>
+      </nav>
+      <button class="btn btn-sm btn-success">Plant a Tree</button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main class="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- LEFT: Categories -->
+    <aside class="col-span-1 bg-white p-4 rounded shadow h-fit">
+      <h3 class="font-semibold mb-3">Categories</h3>
+      <div id="Categories-container" class="flex flex-col gap-2"></div>
+    </aside>
+
+    <!-- CENTER: Plants grid (spans 3 cols on desktop) -->
+    <section class="col-span-1 md:col-span-3">
+      <!-- Banner / top controls -->
+      <div class="mb-4">
+        <div class="bg-green-100 rounded p-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold">Our Plants</h2>
+            <p class="text-sm text-slate-700">Choose a category to filter plants</p>
+          </div>
+
+          <!-- Cart summary -->
+          <div class="bg-white p-3 rounded shadow text-right">
+            <div class="font-medium">Cart</div>
+            <div id="cart-count">0 items</div>
+            <div class="font-bold" id="cart-total">৳0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loader -->
+      <div id="loader" class="hidden flex justify-center my-8">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+      </div>
+
+      <!-- Plants grid -->
+      <div id="plants-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+  </main>
+
+  <!-- Cart drawer simple bottom area -->
+  <div class="fixed right-4 bottom-4 w-80 bg-white shadow rounded p-4">
+    <h4 class="font-semibold mb-2">Cart Items</h4>
+    <ul id="cart-list" class="space-y-2 max-h-44 overflow-auto"></ul>
+    <div class="mt-3 flex justify-between items-center">
+      <div class="font-bold">Total: <span id="cart-total-bottom">৳0</span></div>
+      <button id="checkout-btn" class="btn btn-sm btn-success">Checkout</button>
+    </div>
+  </div>
+
+  <!-- Modal (hidden by default) -->
+  <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-3xl p-6 relative">
+      <button id="modal-close" class="absolute right-3 top-3 btn btn-ghost">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Template styles for loader -->
+  <style>
+    .loader { border-top-color: #10b981; animation: spinner 1s linear infinite; }
+    @keyframes spinner { to { transform: rotate(360deg); } }
+  </style>
+
+  <!-- SCRIPT -->
+  <script>
+    // API base
+    const API_BASE = 'https://openapi.programming-hero.com/api';
+
+    // State
+    let categories = [];
+    let cart = []; // {id, name, price}
+    let activeCategoryId = null;
+
+    // DOM Elements
+    const CategoriesContainer = document.getElementById('Categories-container');
+    const plantsGrid = document.getElementById('plants-grid');
+    const loader = document.getElementById('loader');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+    const modalClose = document.getElementById('modal-close');
+    const cartList = document.getElementById('cart-list');
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cart-total');
+    const cartTotalBottom = document.getElementById('cart-total-bottom');
+
+    // UTIL: show/hide loader
+    function showLoader(show = true) {
+      loader.classList.toggle('hidden', !show);
+    }
+
+    // FORMAT price (assume API has price numeric; otherwise adjust)
+    function formatPrice(num) {
+      if (!num && num !== 0) return '৳0';
+      return '৳' + Number(num).toLocaleString();
+    }
+
+    // LOAD categories
+    async function loadCategories() {
+      try {
+        showLoader(true);
+        const res = await fetch(`${API_BASE}/categories`);
+        const json = await res.json();
+        // some APIs put data in json.data or directly in json.categories
+        categories = json.data?.categories || json.categories || json.data || [];
+        displayCategories(categories);
+      } catch (err) {
+        console.error('Error loading categories:', err);
+      } finally {
+        showLoader(false);
+      }
+    }
+
+    // DISPLAY categories (buttons)
+    function displayCategories(list) {
+      CategoriesContainer.innerHTML = '';
+      if(!Array.isArray(list) || list.length === 0) {
+        CategoriesContainer.innerHTML = '<div class="text-sm text-slate-500">No categories found</div>';
+        return;
+      }
+      for (const cat of list) {
+        // Assuming category object has id and category_id or category_id might be cat.id
+        const id = cat.category_id ?? cat.id ?? cat._id ?? cat.category_id;
+        const name = cat.category_name ?? cat.name ?? cat.title ?? 'Unknown';
+        const btn = document.createElement('button');
+        btn.className = 'text-left p-2 rounded hover:bg-green-50';
+        btn.textContent = name;
+        btn.dataset.catId = id;
+        btn.addEventListener('click', () => {
+          // active state
+          document.querySelectorAll('#Categories-container button').forEach(b => b.classList.remove('active-cat'));
+          btn.classList.add('active-cat');
+          activeCategoryId = id;
+          loadCategoryPlants(id);
+        });
+        CategoriesContainer.appendChild(btn);
+      }
+    }
+
+    // LOAD plants by category
+    async function loadCategoryPlants(id) {
+      try {
+        showLoader(true);
+        plantsGrid.innerHTML = '';
+        // API: /category/${id}
+        const res = await fetch(`${API_BASE}/category/${id}`);
+        const json = await res.json();
+        // Possible data location
+        const plants = json.data?.plants || json.plants || json.data || [];
+        displayPlants(plants);
+      } catch (err) {
+        console.error('Error loading plants by category:', err);
+      } finally {
+        showLoader(false);
+      }
+    }
+
+    // DISPLAY plants in grid
+    function displayPlants(plants) {
+      plantsGrid.innerHTML = '';
+      if (!Array.isArray(plants) || plants.length === 0) {
+        plantsGrid.innerHTML = '<div class="bg-white p-6 rounded shadow">No plants found for this category.</div>';
+        return;
+      }
+      for (const p of plants) {
+        const id = p.id ?? p.plant_id ?? p._id ?? p.id;
+        const name = p.name ?? p.plant_name ?? 'Unknown Plant';
+        const img = p.image ?? p.img ?? p.thumbnail ?? '';
+        const short = p.short_description ?? p.description?.slice(0, 120) ?? 'No description';
+        const category = p.category ?? p.category_name ?? 'Uncategorized';
+        const price = p.price ?? p.cost ?? (Math.floor(Math.random() * 500) + 100); // fallback random
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded shadow overflow-hidden';
+
+        card.innerHTML = `
+          <img src="${img}" alt="${name}" class="h-44 w-full object-cover bg-slate-100">
+          <div class="p-4">
+            <h3 class="text-lg font-semibold cursor-pointer plant-name" data-id="${id}">${name}</h3>
+            <p class="text-sm text-slate-600 mt-2">${short}</p>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-slate-700">${category}</div>
+              <div class="font-bold">${formatPrice(price)}</div>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <button class="add-to-cart btn btn-sm btn-outline" data-id="${id}" data-name="${escapeHtml(name)}" data-price="${price}">Add to Cart</button>
+              <button class="btn btn-sm btn-ghost view-detail" data-id="${id}">Details</button>
+            </div>
+          </div>
+        `;
+        plantsGrid.appendChild(card);
+      }
+
+      // delegate events for plant name click (modal) and add-to-cart
+      plantsGrid.querySelectorAll('.plant-name').forEach(el => {
+        el.addEventListener('click', async (e) => {
+          const pid = e.target.dataset.id;
+          await openPlantModal(pid);
+        });
+      });
+
+      plantsGrid.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = btn.dataset.id;
+          const name = unescapeHtml(btn.dataset.name);
+          const price = Number(btn.dataset.price) || 0;
+          addToCart({ id, name, price });
+        });
+      });
+
+      plantsGrid.querySelectorAll('.view-detail').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const pid = btn.dataset.id;
+          await openPlantModal(pid);
+        });
+      });
+    }
+
+    // OPEN modal with plant details (calls API /plant/${id})
+    async function openPlantModal(id) {
+      try {
+        showLoader(true);
+        const res = await fetch(`${API_BASE}/plant/${id}`);
+        const json = await res.json();
+        const plant = json.data || json.plant || json;
+        renderModal(plant);
+      } catch (err) {
+        console.error('Error fetching plant details:', err);
+        renderModal({ name: 'Error', description: 'Could not load details.' });
+      } finally {
+        showLoader(false);
+      }
+    }
+
+    function renderModal(plant) {
+      modalContent.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-1">
+            <img src="${plant.image ?? plant.img ?? ''}" alt="${plant.name ?? ''}" class="w-full h-48 object-cover rounded"/>
+          </div>
+          <div class="md:col-span-2">
+            <h2 class="text-2xl font-bold mb-2">${plant.name ?? plant.plant_name ?? 'Plant'}</h2>
+            <p class="text-sm text-slate-700 mb-3">${plant.description ?? plant.full_description ?? 'No details available.'}</p>
+            <div class="text-sm">Category: <strong>${plant.category ?? plant.category_name ?? ''}</strong></div>
+            <div class="text-sm">Price: <strong>${formatPrice(plant.price ?? plant.cost ?? 0)}</strong></div>
+            <div class="mt-4">
+              <button id="modal-add-cart" class="btn btn-success">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      `;
+      // add cart from modal
+      document.getElementById('modal-add-cart').addEventListener('click', () => {
+        addToCart({
+          id: plant.id ?? plant._id ?? plant.plant_id ?? Math.random().toString(36).slice(2),
+          name: plant.name ?? plant.plant_name ?? 'Unknown',
+          price: Number(plant.price ?? plant.cost ?? 0)
+        });
+        closeModal();
+      });
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modalContent.innerHTML = '';
+    }
+
+    // CART logic
+    function addToCart(item) {
+      // if same id exists, increase quantity OR simply allow duplicates - we'll store quantity
+      const existing = cart.find(c => c.id === item.id);
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(c => c.id !== id);
+      renderCart();
+    }
+
+    function renderCart() {
+      cartList.innerHTML = '';
+      if (cart.length === 0) {
+        cartList.innerHTML = '<li class="text-sm text-slate-500">Cart is empty</li>';
+      } else {
+        for (const c of cart) {
+          const li = document.createElement('li');
+          li.className = 'flex items-center justify-between';
+          li.innerHTML = `
+            <div>
+              <div class="font-medium">${c.name}</div>
+              <div class="text-xs text-slate-600">${c.qty} x ${formatPrice(c.price)}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="font-bold">${formatPrice(c.price * c.qty)}</div>
+              <button class="btn btn-ghost btn-sm remove-item" data-id="${c.id}">✕</button>
+            </div>
+          `;
+          cartList.appendChild(li);
+        }
+        // attach remove handlers
+        cartList.querySelectorAll('.remove-item').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            removeFromCart(id);
+          });
+        });
+      }
+
+      // totals
+      const total = cart.reduce((s, it) => s + (Number(it.price) * (it.qty || 1)), 0);
+      cartCount.textContent = `${cart.reduce((s, it) => s + (it.qty || 1), 0)} items`;
+      cartTotal.textContent = formatPrice(total);
+      cartTotalBottom.textContent = formatPrice(total);
+    }
+
+    // small sanitize helpers
+    function escapeHtml(text) {
+      return String(text).replaceAll('"','&quot;').replaceAll("'","&#39;");
+    }
+    function unescapeHtml(text) {
+      return String(text).replaceAll('&quot;','"').replaceAll('&#39;',"'");
+    }
+
+    // init
+    loadCategories();
+    renderCart();
+
+  </script>
+</body>
+</html>
