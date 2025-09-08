@@ -30,7 +30,7 @@ function displayCategories(cats){
   categoriesContainer.innerHTML = "<h2 class='font-bold mb-4'>Categories</h2>";
   cats.forEach(cat=>{
     const btn = document.createElement("button");
-    btn.className="block w-full text-left mb-2 px-2 py-1 border rounded hover:bg-green-500 hover:text-white";
+    btn.className="block w-full text-left mb-2 px-2 py-1 rounded hover:bg-green-500 hover:text-white";
     btn.textContent = cat.category_name;
     btn.addEventListener("click", ()=>{
       setActiveCategory(btn);
@@ -80,7 +80,7 @@ function displayTrees(trees){
       <h2 class="font-bold cursor-pointer text-green-800">${name}</h2>
       <p class="text-gray-600">${desc}...</p>
       <p class="font-semibold mt-1">Price: ৳${price}</p>
-      <button class="mt-2 px-3 py-1 bg-yellow-400 text-green-800 rounded">Add to Cart</button>
+      <button class="mt-2 px-3 py-1 bg-yellow-400 text-green-800 rounded w-full">Add to Cart</button>
     `;
 
    // Modal on name click 
@@ -105,18 +105,15 @@ function openModal(id){
        console.log(json);
       const plant = json.plants || {};
       modalContent.innerHTML=`
-        <div class="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-1 gap-4">
-          <div class="md:col-span-1">
-            <img src="${plant.image??''}" alt="${plant.name??''}" class="w-full h-48 object-cover rounded"/>
+        <div class="grid grid-cols-1 lg:grid-cols-1 sm:grid-cols-1 gap-4">
+          <div class="md:col-1">
+          <h2 class="text-2xl font-bold mb-2">${plant.name??'Plant'}</h2>
+            <img src="${plant.image??''}" alt="${plant.name??''}" class="w-90 h-50 object-cover rounded"/>
           </div>
           <div class="md:col-span-2">
-            <h2 class="text-2xl font-bold mb-2">${plant.name??'Plant'}</h2>
-            <p class="text-sm text-gray-700 mb-3">${plant.description??'No details'}</p>
-            <div class="text-sm">Category: <strong>${plant.category??''}</strong></div>
-            <div class="text-sm">Price: <strong>৳${plant.price??0}</strong></div>
-            <div class="mt-4">
-              <button id="modal-add-cart" class="px-3 py-1 bg-green-500 text-white rounded">Add to Cart</button>
-            </div>
+            <div ><span class="text-black text-sm font-bold">Category: </span><strong"> ${plant.category??''}</strong></div>
+             <div><span class="text-black text-sm font-bold">Price: ৳</span> ${plant.price??0}</div>
+            <p class="text-sm  text-gray-700 mb-3"><span class="text-black text-sm font-bold">description:</span> ${plant.description??'No details'}</p>
           </div>
         </div>
       `;
@@ -152,7 +149,7 @@ function renderCart(){
     const div = document.createElement("div");
     div.className="flex justify-between items-center bg-gray-100 p-2 mb-1 rounded";
     div.innerHTML=`<span>${c.name} x ${c.qty}</span>
-                   <span>৳${c.price*c.qty} <button class="text-red-500 ml-2">❌</button></span>`;
+                   <span>৳${c.price*c.qty} <button class="text-red-500 ml-2">❌\</button></span>`;
     div.querySelector("button").addEventListener("click",()=>removeFromCart(c.id));
     cartListDiv.appendChild(div);
   });
