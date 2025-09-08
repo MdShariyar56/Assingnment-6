@@ -33,8 +33,8 @@ function displayCategories(cats){
     btn.className="block w-full text-left mb-2 px-2 py-1 border rounded hover:bg-green-500 hover:text-white";
     btn.textContent = cat.category_name;
     btn.addEventListener("click", ()=>{
-      //
-      //
+      setActiveCategory(btn);
+      loadCategoryTrees(cat.id);
     });
     categoriesContainer.appendChild(btn);
   });
@@ -83,14 +83,82 @@ function displayTrees(trees){
       <button class="mt-2 px-3 py-1 bg-yellow-400 text-green-800 rounded">Add to Cart</button>
     `;
 
-    
+   // Modal on name click 
+    card.querySelector("h2").addEventListener("click", ()=>openModal(id)); 
+    // Add to Cart 
+    card.querySelector("button").addEventListener("click", ()=>{ addToCart({id,name,price}); });
 
     grid.appendChild(card);
   });
 
   treeContainer.appendChild(grid);
 }
-//
+
+function openModal(id){
+  modalContent.innerHTML='<span class="loading loading-spinner text-error"></span>';
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  fetch(API_PLANT_DETAIL(id))
+    .then(res=>res.json())
+    .then(json=>{
+       console.log(json);
+      const plant = json.plants || {};
+      modalContent.innerHTML=`
+        <div class="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-1 gap-4">
+          <div class="md:col-span-1">
+            <img src="${plant.image??''}" alt="${plant.name??''}" class="w-full h-48 object-cover rounded"/>
+          </div>
+          <div class="md:col-span-2">
+            <h2 class="text-2xl font-bold mb-2">${plant.name??'Plant'}</h2>
+            <p class="text-sm text-gray-700 mb-3">${plant.description??'No details'}</p>
+            <div class="text-sm">Category: <strong>${plant.category??''}</strong></div>
+            <div class="text-sm">Price: <strong>৳${plant.price??0}</strong></div>
+            <div class="mt-4">
+              <button id="modal-add-cart" class="px-3 py-1 bg-green-500 text-white rounded">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("modal-add-cart").addEventListener("click", ()=>{
+        addToCart({
+          id: plant.id ?? Math.random().toString(36).slice(2),
+          name: plant.name ?? 'Unknown',
+          price: Number(plant.price??0)
+        });
+        closeModal();
+      });
+    });
+}
+
+modalClose.addEventListener("click", closeModal);
+modal.addEventListener("click",(e)=>{if(e.target===modal) closeModal();});
+
+function closeModal(){modal.classList.add("hidden"); modal.classList.remove("flex"); modalContent.innerHTML='';}
+
+function addToCart(item){
+  const existing = cart.find(c=>c.id===item.id);
+  if(existing) existing.qty++;
+  else cart.push({...item,qty:1});
+  renderCart();
+}
+
+function removeFromCart(id){cart = cart.filter(c=>c.id!==id); renderCart();}
+
+function renderCart(){
+  if(cart.length===0){cartListDiv.innerHTML="<p>Cart is empty</p>"; cartTotalDiv.textContent="Total: ৳0"; return;}
+  cartListDiv.innerHTML="";
+  cart.forEach(c=>{
+    const div = document.createElement("div");
+    div.className="flex justify-between items-center bg-gray-100 p-2 mb-1 rounded";
+    div.innerHTML=`<span>${c.name} x ${c.qty}</span>
+                   <span>৳${c.price*c.qty} <button class="text-red-500 ml-2">❌</button></span>`;
+    div.querySelector("button").addEventListener("click",()=>removeFromCart(c.id));
+    cartListDiv.appendChild(div);
+  });
+  const total = cart.reduce((sum,it)=>sum+it.price*it.qty,0);
+  cartTotalDiv.textContent="Total: ৳"+total;
+}
 
 
 
