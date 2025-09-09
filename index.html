@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="./styles.css">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
      <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body class="bg-[#f0fdf4] overscroll-none">
+<body class="bg-[#f0fdf4] overscroll-none m-0 p-0 overflow-x-hidden">
    <header>
   <div class="navbar bg-[#15803d] shadow-sm px-6">
     <div class="navbar-start">
@@ -44,22 +45,22 @@
   </div>
 </header>
 <section>
-    <div class="bg-[#cff0dc] flex flex-col justify-between items-center  lg:flex-row  lg:px-20 ">
+    <div class="bg-[#cff0dc] flex flex-col justify-between items-center  lg:flex-row  lg:px-20  mb-4">
         <div><img src="./assets/hero-leaf1.png" alt=""></div>
           <div class="text-center">
             <h1 class="text-4xl font-bold mb-2">Plant a Tree, Grow a Future</h1>
             <p class="text-[#1f2937] mt-5">Join our mission to plant 1 million trees and make the Earth greener for future generations.</p>
-            <button class="btn  bg-[#facc15] rounded-full text-[#15803d] mt-5 ">Get Involved</button>
+            <button class="btn  bg-[#facc15] rounded-full text-[#15803d] mt-5 mb-4">Get Involved</button>
         </div>
          <div><img src="./assets/hero-leaf2.png" alt=""></div>
     </div>
 </section> 
 
 <section>
-  <div class="flex flex-col lg:flex-row  lg:h-screen p-4 gap-4">
+  <div class="flex justify-between  flex-col lg:flex-row  lg:h-screen p-6 gap-2">
  <!-- Categories Sidebar -->
   <div >
-    <h2 class='text-2xl font-bold mb-2 text-center'>Categories</h2>
+    <h2 class='text-2xl font-bold mb-2 text-center '>Categories</h2>
 <div id="Categories-container" class="grid grid-cols-3 sm:grid-cols-3 lg:flex lg:flex-col gap-1">
 </div>
   </div>
@@ -67,14 +68,15 @@
 
 
   <!-- 2. Tree Cards -->
-  <div id="tree-container" class="w-full lg:w-3/5 overflow-y-auto">
+  <div id="tree-container" class="w-full lg:w-3/4 overflow-y-auto ">
+   
   </div>
 
   <!-- 3. Cart Summary -->
-  <div id="cart-container" class="w-full lg:w-1/5 bg-white p-4 rounded shadow overflow-y-auto mt-4 lg:mt-0">
-    <h2 class="font-bold mb-4">Your Cart</h2>
-    <div id="cart-list"><p>Cart is empty</p></div>
-    <div id="cart-total" class="font-bold mt-4">Total: ৳0</div>
+  <div id="cart-container" class="grid grid-cols lg:flex w-full lg:w-1/5 lg:flex-col gap-2 bg-white px-3 ">
+    <h2 class='text-2xl font-bold mb-2 text-start'>Your Cart</h2>
+    <div id="cart-list"><p>Emty card</p></div>
+    <div id="cart-total" class="font-bold mt-4">Total: 0Tk</div>
   </div>
 </div>
 
@@ -136,7 +138,7 @@
     <!-- Modal -->
 <div id="tree-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
   <div class="bg-white p-6 rounded-lg max-w-sm w-300  relative">
-    <button id="modal-close" class="absolute top-3 right-3 btn btn-ghost">✕</button>
+     <button id="modal-close" class="absolute top-3 right-3 hover:text-red-500 text-2xl ml-2"><i class="fa-solid fa-square-xmark"></i></button>
     <div id="modal-content"></div>
   </div>
 </div>

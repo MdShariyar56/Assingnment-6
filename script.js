@@ -20,17 +20,17 @@ function loadCategories(){
   fetch(API_ALL_CATEGORIES)
     .then(res=>res.json())
     .then(json=>{
-      console.log(json)
       const cats = json.categories ?? [];
       displayCategories(cats);
     });
+
 }
 
 function displayCategories(cats){
   categoriesContainer.innerHTML = "";
   cats.forEach(cat=>{
     const btn = document.createElement("button");
-    btn.className="px-2 py-1 text-base font-semibold bg-white text-green-800 hover:bg-green-500 hover:text-white rounded";
+    btn.className="px-2 py-2 text-base font-semibold  text-green-800 hover:bg-green-500 hover:text-white rounded";
     btn.textContent = cat.category_name;
     btn.addEventListener("click", ()=>{
       setActiveCategory(btn);
@@ -79,8 +79,8 @@ function displayTrees(trees){
       <img src="${img}" class="w-full h-40 object-cover rounded mb-2"/>
       <h2 class="font-bold cursor-pointer text-green-800">${name}</h2>
       <p class="text-gray-600">${desc}...</p>
-      <p class="font-semibold mt-1">Price: ৳${price}</p>
-      <button class="mt-2 px-3 py-1 bg-yellow-400 text-green-800 rounded w-full">Add to Cart</button>
+      <p class="font-semibold mt-1">Price : ${price}Tk</p>
+      <button class="mt-2 px-3 py-1 bg-green-800 text-white rounded w-full">Add to Cart</button>
     `;
 
    // Modal on name click 
@@ -111,9 +111,9 @@ function openModal(id){
             <img src="${plant.image??''}" alt="${plant.name??''}" class="w-90 h-50 object-cover rounded"/>
           </div>
           <div class="md:col-span-2">
-            <div ><span class="text-black text-sm font-bold">Category: </span><strong"> ${plant.category??''}</strong></div>
-             <div><span class="text-black text-sm font-bold">Price: ৳</span> ${plant.price??0}</div>
-            <p class="text-sm  text-gray-700 mb-3"><span class="text-black text-sm font-bold">description:</span> ${plant.description??'No details'}</p>
+            <div ><span class="text-black text-sm font-bold">Category : </span><strong"> ${plant.category??''}</strong></div>
+             <div><span class="text-black text-sm font-bold">Price : </span> ${plant.price??0}Tk</div>
+            <p class="text-sm  text-gray-700 mb-3"><span class="text-black text-sm font-bold">description :</span> ${plant.description??'No details'}</p>
           </div>
         </div>
       `;
@@ -136,18 +136,19 @@ function addToCart(item){
 function removeFromCart(id){cart = cart.filter(c=>c.id!==id); renderCart();}
 
 function renderCart(){
-  if(cart.length===0){cartListDiv.innerHTML="<p>Cart is empty</p>"; cartTotalDiv.textContent="Total: ৳0"; return;}
+  if(cart.length===0){cartListDiv.innerHTML="<p>Emty card</p>"; cartTotalDiv.textContent="Total: 0Tk"; return;}
   cartListDiv.innerHTML="";
   cart.forEach(c=>{
     const div = document.createElement("div");
-    div.className="flex justify-between items-center bg-gray-100 p-2 mb-1 rounded";
-    div.innerHTML=`<span>${c.name} x ${c.qty}</span>
-                   <span>৳${c.price*c.qty} <button class="text-red-500 ml-2">❌\</button></span>`;
+    div.className="flex justify-between items-center bg-[#f0fdf4] p-2 mb-1 rounded";
+    div.innerHTML=`<div> <div><span class="font-semibold">${c.name} </span></div> 
+    <div><span class="text-gray-400">Tk ${c.price*c.qty} x ${c.qty} Size</span></div> </div>   
+                    <button class=" hover:text-red-500 text-2xl ml-2"><i class="fa-solid fa-square-xmark"></i></button>`;
     div.querySelector("button").addEventListener("click",()=>removeFromCart(c.id));
     cartListDiv.appendChild(div);
   });
   const total = cart.reduce((sum,it)=>sum+it.price*it.qty,0);
-  cartTotalDiv.textContent="Total: ৳"+total;
+  cartTotalDiv.textContent="Total: "+total+" Tk";
 }
 
 
