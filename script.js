@@ -27,10 +27,10 @@ function loadCategories(){
 }
 
 function displayCategories(cats){
-  categoriesContainer.innerHTML = "<h2 class='font-bold mb-4'>Categories</h2>";
+  categoriesContainer.innerHTML = "";
   cats.forEach(cat=>{
     const btn = document.createElement("button");
-    btn.className="block w-full text-left mb-2 px-2 py-1 rounded hover:bg-green-500 hover:text-white";
+    btn.className="px-2 py-1 text-base font-semibold bg-white text-green-800 hover:bg-green-500 hover:text-white rounded";
     btn.textContent = cat.category_name;
     btn.addEventListener("click", ()=>{
       setActiveCategory(btn);
@@ -44,7 +44,7 @@ function setActiveCategory(activeBtn){
   categoriesContainer.querySelectorAll("button").forEach(btn=>{
     btn.classList.remove("bg-green-500","text-white");
   });
-  activeBtn.classList.add("bg-green-500","text-white");
+  activeBtn.classList.add("bg-green-500","text-black");
 }
 
 
@@ -64,7 +64,7 @@ function displayTrees(trees){
   if(trees.length===0){ treeContainer.innerHTML="<p>No trees found.</p>"; return; }
 
   const grid = document.createElement("div");
-  grid.className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+  grid.className="grid gap-6 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3";
 
   trees.forEach(tree=>{
     const id = tree.id ?? tree.plant_id ?? Math.random().toString(36).slice(2);
@@ -117,14 +117,7 @@ function openModal(id){
           </div>
         </div>
       `;
-      document.getElementById("modal-add-cart").addEventListener("click", ()=>{
-        addToCart({
-          id: plant.id ?? Math.random().toString(36).slice(2),
-          name: plant.name ?? 'Unknown',
-          price: Number(plant.price??0)
-        });
-        closeModal();
-      });
+    
     });
 }
 

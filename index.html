@@ -44,45 +44,47 @@
   </div>
 </header>
 <section>
-    <div class="bg-[#cff0dc] flex justify-between items-center ">
+    <div class="bg-[#cff0dc] flex flex-col justify-between items-center  lg:flex-row  lg:px-20 ">
         <div><img src="./assets/hero-leaf1.png" alt=""></div>
           <div class="text-center">
             <h1 class="text-4xl font-bold mb-2">Plant a Tree, Grow a Future</h1>
             <p class="text-[#1f2937] mt-5">Join our mission to plant 1 million trees and make the Earth greener for future generations.</p>
-            <button class="btn  bg-[#facc15] rounded-full text-[#15803d] mt-5 mb-4">Get Involved</button>
+            <button class="btn  bg-[#facc15] rounded-full text-[#15803d] mt-5 ">Get Involved</button>
         </div>
          <div><img src="./assets/hero-leaf2.png" alt=""></div>
     </div>
 </section> 
-<section>
-  <h1 class="text-3xl font-semibold text-center py-5">Choose Your Trees</h1>
-        
-<div class="flex h-screen p-4 gap-4">
 
-  <!-- 1. Categories Sidebar -->
-  <div id="Categories-container" class="w-1/5 bg-white p-4 rounded shadow overflow-y-auto">
-    <h2 class="font-bold mb-4">Categories</h2>
+<section>
+  <div class="flex flex-col lg:flex-row  lg:h-screen p-4 gap-4">
+ <!-- Categories Sidebar -->
+  <div >
+    <h2 class='text-2xl font-bold mb-2 text-center'>Categories</h2>
+<div id="Categories-container" class="grid grid-cols-3 sm:grid-cols-3 lg:flex lg:flex-col gap-1">
+</div>
   </div>
+  
+
 
   <!-- 2. Tree Cards -->
-  <div id="tree-container" class="w-3/5 overflow-y-auto">
+  <div id="tree-container" class="w-full lg:w-3/5 overflow-y-auto">
   </div>
 
   <!-- 3. Cart Summary -->
-  <div id="cart-container" class="w-1/5 bg-white p-4 rounded shadow overflow-y-auto">
+  <div id="cart-container" class="w-full lg:w-1/5 bg-white p-4 rounded shadow overflow-y-auto mt-4 lg:mt-0">
     <h2 class="font-bold mb-4">Your Cart</h2>
     <div id="cart-list"><p>Cart is empty</p></div>
     <div id="cart-total" class="font-bold mt-4">Total: ৳0</div>
   </div>
-
 </div>
+
 </section>
 
 <section class="py-10">
-  <h1 class="text-xl lg:text-2xl font-semibold text-center mt-4 py-4 mb-8">
+  <h1 class="text-xl  lg:text-2xl font-semibold text-center mt-4 py-4 mb-8">
     About the Campaign
   </h1>
-  <div class="flex justify-center items-center  px-20 gap-5">
+  <div class="flex justify-center items-center flex-col lg:flex-row  lg:px-10  gap-5">
     
     <!-- Image -->
     <div class="w-full lg:w-1/3">
